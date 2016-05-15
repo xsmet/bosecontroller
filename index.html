@@ -1,0 +1,85 @@
+<html>
+<head>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script language="JavaScript">
+var url='192.168.0.205';
+var cmdport='8090';
+var wsport='8080';
+
+function bose(arg) {
+  get(arg);
+}
+
+function get(page) {
+  document.ifr = document.createElement('iframe');
+  $("#target").load('http://'+url+':'+cmdport+'/'+page);
+}
+
+function preset(el) {
+  console.log(el.value);
+  xml='<key state="press" sender="Gabbo">PRESET_'+el.value+'</key>';
+  post('key', xml);
+  xml='<key state="release" sender="Gabbo">PRESET_'+el.value+'</key>';
+  post('key', xml);
+}
+
+function key(el) {
+  xml='<key state="press" sender="Gabbo">'+el.value+'</key>';
+  post('key', xml);
+  xml='<key state="release" sender="Gabbo">'+el.value+'</key>';
+  post('key', xml);
+}
+
+function post(page, str) {
+  console.log(str);
+  $.ajax({
+     url: 'http://'+url+':'+cmdport+'/'+page, 
+     processData: false,
+     type: "POST",
+     data: str,
+     success: function(response){
+       console.log(response);
+     },
+     error: function(response) {
+        console.log(response);
+     }
+  });
+}
+
+var connection;
+function listen() {
+  connection = new WebSocket('ws://' + url + ':' + wsport, "gabbo");
+  connection.onopen = function() { $("#messages").append("Connection open.<br />"); };
+  connection.onmessage = function(e) { $("#messages").append(e.data+"<br /><br />"); };
+}
+// on page load
+
+function loaded() {
+  listen();
+  $("#info").append(url);
+}
+
+</script>
+</head>
+<body onload="loaded();">
+<div id="info"></div>
+8090:
+<input type="button" value="trackInfo" onclick="bose('trackInfo');" />
+<input type="button" value="now_playing" onclick="bose('now_playing');" />
+<input type="button" value="info" onclick="bose('info');" />
+<br />Controls:
+<input type="button" value="1" onclick="preset(this);" />
+<input type="button" value="2" onclick="preset(this);" />
+<input type="button" value="3" onclick="preset(this);" />
+<input type="button" value="4" onclick="preset(this);" />
+<input type="button" value="5" onclick="preset(this);" />
+<input type="button" value="6" onclick="preset(this);" />
+<input type="button" value="STOP" onclick="key(this);" />
+<input type="button" value="PLAY" onclick="key(this);" />
+ 
+<pre><code><div id="target"></div></code></pre>
+<div id="ajaxstatus"></div>
+<div id="messages"></div>
+</body>
+
+</html>
