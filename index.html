@@ -7,16 +7,10 @@ var cmdport='8090';
 var wsport='8080';
 
 function bose(arg) {
-  get(arg);
-}
-
-function get(page) {
-  document.ifr = document.createElement('iframe');
   $("#target").load('http://'+url+':'+cmdport+'/'+page);
 }
 
 function preset(el) {
-  console.log(el.value);
   xml='<key state="press" sender="Gabbo">PRESET_'+el.value+'</key>';
   post('key', xml);
   xml='<key state="release" sender="Gabbo">PRESET_'+el.value+'</key>';
@@ -52,8 +46,8 @@ function listen() {
   connection.onopen = function() { $("#messages").append("Connection open.<br />"); };
   connection.onmessage = function(e) { $("#messages").append(e.data+"<br /><br />"); };
 }
-// on page load
 
+// on page load
 function loaded() {
   listen();
   $("#info").append(url);
